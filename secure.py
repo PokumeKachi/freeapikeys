@@ -1,4 +1,5 @@
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.exceptions import InvalidTag
 from argon2.low_level import hash_secret_raw, Type
 import os, sys
 
@@ -26,5 +27,12 @@ elif mode == "decrypt":
     blob = open("secrets.enc", "rb").read()
     assert blob[:3] == MAGIC
     salt, nonce, ct = blob[4:20], blob[20:32], blob[32:]
-    data = AESGCM(kdf(password, salt)).decrypt(nonce, ct, None)
-    open("secrets.dec.md", "wb").write(data)
+
+    try:
+        data = AESGCM(kdf(password, salt)).decrypt(nonce, ct, None)
+    except InvalidTag:
+        print('wrong password idiot')
+    except Exception as e:
+        print(e)
+    else:
+        open("secrets.dec.md", "wb").write(data)
