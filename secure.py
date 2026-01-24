@@ -9,7 +9,7 @@ VERSION = b"\x01"
 def kdf(password, salt):
     return hash_secret_raw(
         password, salt,
-        time_cost=3, memory_cost=64*1024, parallelism=2,
+        time_cost=10, memory_cost=1024*1024, parallelism=os.cpu_count(),
         hash_len=32, type=Type.ID
     )
 
